@@ -1,0 +1,320 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  와이어프레임 매핑:
+  - 썸네일: thumbnail_view
+  - 제목 / 메타: title_text + meta_text
+  - 태그 chips: tags_chip_group (chip_uncategorized + chip_add_tag)
+  - 노트: note_input
+  - 리마인드 (UI only): reminder_row
+  - 바텀바: cta_btn + folder_btn + cancel_btn
+-->
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@android:color/white"
+    android:paddingBottom="8dp">
+
+    <!-- 닫기 버튼 (오른쪽 위) -->
+    <ImageButton
+        android:id="@+id/close_btn"
+        android:layout_width="36dp"
+        android:layout_height="36dp"
+        android:src="@android:drawable/ic_menu_close_clear_cancel"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:contentDescription="닫기"
+        android:padding="8dp"
+        android:tint="#888888"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="4dp"
+        android:layout_marginEnd="8dp"/>
+
+    <!-- 썸네일 -->
+    <FrameLayout
+        android:id="@+id/thumbnail_container"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginHorizontal="16dp"
+        android:layout_marginTop="12dp"
+        android:background="@drawable/share_thumbnail_bg"
+        app:layout_constraintTop_toBottomOf="@id/close_btn"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintDimensionRatio="4:3">
+
+        <ImageView
+            android:id="@+id/thumbnail_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scaleType="centerCrop"
+            android:contentDescription="썸네일"/>
+
+        <ProgressBar
+            android:id="@+id/thumbnail_progress"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"/>
+
+        <TextView
+            android:id="@+id/thumbnail_placeholder"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="🔗"
+            android:textSize="28sp"
+            android:visibility="gone"/>
+    </FrameLayout>
+
+    <!-- 제목 -->
+    <TextView
+        android:id="@+id/title_text"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="16dp"
+        android:layout_marginTop="12dp"
+        android:textColor="#111111"
+        android:textSize="15sp"
+        android:textStyle="bold"
+        android:maxLines="2"
+        android:ellipsize="end"
+        tools:text="(제목 없음)"
+        app:layout_constraintTop_toBottomOf="@id/thumbnail_container"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+
+    <TextView
+        android:id="@+id/meta_text"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="16dp"
+        android:layout_marginTop="2dp"
+        android:textColor="#888888"
+        android:textSize="11sp"
+        tools:text="apps.apple.com · 2026. 5. 21."
+        app:layout_constraintTop_toBottomOf="@id/title_text"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+
+    <!-- 태그 섹션 라벨 -->
+    <TextView
+        android:id="@+id/tags_label"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="12dp"
+        android:text="태그"
+        android:textAllCaps="true"
+        android:textColor="#AAAAAA"
+        android:textSize="10sp"
+        android:textStyle="bold"
+        android:letterSpacing="0.08"
+        app:layout_constraintTop_toBottomOf="@id/meta_text"
+        app:layout_constraintStart_toStartOf="parent"/>
+
+    <com.google.android.material.chip.ChipGroup
+        android:id="@+id/tags_chip_group"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="16dp"
+        android:layout_marginTop="4dp"
+        app:singleLine="false"
+        app:chipSpacingHorizontal="6dp"
+        app:chipSpacingVertical="4dp"
+        app:layout_constraintTop_toBottomOf="@id/tags_label"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <com.google.android.material.chip.Chip
+            android:id="@+id/chip_uncategorized"
+            style="@style/Widget.MaterialComponents.Chip.Action"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="🔒 uncategorized"
+            android:textColor="#92400E"
+            android:textSize="11sp"
+            android:textStyle="bold"
+            app:chipBackgroundColor="#FEF3C7"
+            app:chipMinHeight="24dp"
+            app:chipStrokeWidth="0dp"/>
+
+        <com.google.android.material.chip.Chip
+            android:id="@+id/chip_add_tag"
+            style="@style/Widget.MaterialComponents.Chip.Action"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="＋ 태그 추가"
+            android:textColor="#166534"
+            android:textSize="11sp"
+            android:textStyle="bold"
+            app:chipBackgroundColor="#DCFCE7"
+            app:chipMinHeight="24dp"
+            app:chipStrokeWidth="0dp"/>
+    </com.google.android.material.chip.ChipGroup>
+
+    <!-- 노트 -->
+    <LinearLayout
+        android:id="@+id/note_row"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="16dp"
+        android:layout_marginTop="10dp"
+        android:padding="9dp"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:background="@drawable/share_row_bg"
+        app:layout_constraintTop_toBottomOf="@id/tags_chip_group"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="📝"
+            android:textSize="13sp"
+            android:layout_marginEnd="8dp"/>
+
+        <EditText
+            android:id="@+id/note_input"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:hint="노트 추가..."
+            android:textColorHint="#AAAAAA"
+            android:textColor="#333333"
+            android:textSize="12sp"
+            android:background="@null"
+            android:minHeight="24dp"
+            android:maxLines="4"
+            android:inputType="textMultiLine|textCapSentences"/>
+    </LinearLayout>
+
+    <!-- 리마인드 (UI only) -->
+    <LinearLayout
+        android:id="@+id/reminder_row"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="16dp"
+        android:layout_marginTop="10dp"
+        android:padding="9dp"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:background="@drawable/share_row_bg"
+        app:layout_constraintTop_toBottomOf="@id/note_row"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <View
+            android:layout_width="7dp"
+            android:layout_height="7dp"
+            android:layout_marginEnd="7dp"
+            android:background="@drawable/share_dot"/>
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="리마인드 없음"
+            android:textColor="#AAAAAA"
+            android:textSize="12sp"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="＋"
+            android:textColor="#AAAAAA"
+            android:textSize="13sp"/>
+    </LinearLayout>
+
+    <!-- 상태 메시지 -->
+    <TextView
+        android:id="@+id/status_text"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:layout_marginHorizontal="16dp"
+        android:textSize="11sp"
+        android:textStyle="bold"
+        android:gravity="center"
+        android:visibility="gone"
+        app:layout_constraintTop_toBottomOf="@id/reminder_row"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        tools:text="✓ '요리모음'에 저장됨"
+        tools:visibility="visible"
+        tools:textColor="#16A34A"/>
+
+    <!-- 바텀바 구분선 -->
+    <View
+        android:id="@+id/bottom_divider"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginTop="12dp"
+        android:background="#F3F2F0"
+        app:layout_constraintTop_toBottomOf="@id/status_text"/>
+
+    <!-- CTA 버튼 -->
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/cta_btn"
+        style="@style/Widget.MaterialComponents.Button"
+        android:layout_width="0dp"
+        android:layout_height="40dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="12dp"
+        android:text="추가하기"
+        android:textSize="13sp"
+        android:textStyle="bold"
+        android:textColor="@android:color/white"
+        app:backgroundTint="#1A1A1A"
+        app:cornerRadius="10dp"
+        app:layout_constraintTop_toBottomOf="@id/bottom_divider"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/folder_btn"
+        app:layout_constraintHorizontal_chainStyle="packed"/>
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/folder_btn"
+        style="@style/Widget.MaterialComponents.Button.UnelevatedButton"
+        android:layout_width="34dp"
+        android:layout_height="34dp"
+        android:layout_marginStart="8dp"
+        android:text="📁"
+        android:textSize="15sp"
+        android:gravity="center"
+        android:insetTop="0dp"
+        android:insetBottom="0dp"
+        android:padding="0dp"
+        android:minWidth="34dp"
+        android:contentDescription="폴더 선택"
+        app:backgroundTint="#F3F2F0"
+        app:cornerRadius="17dp"
+        app:layout_constraintTop_toTopOf="@id/cta_btn"
+        app:layout_constraintBottom_toBottomOf="@id/cta_btn"
+        app:layout_constraintStart_toEndOf="@id/cta_btn"
+        app:layout_constraintEnd_toStartOf="@id/cancel_btn"/>
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/cancel_btn"
+        style="@style/Widget.MaterialComponents.Button.UnelevatedButton"
+        android:layout_width="34dp"
+        android:layout_height="34dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="16dp"
+        android:text="🗑"
+        android:textSize="15sp"
+        android:gravity="center"
+        android:insetTop="0dp"
+        android:insetBottom="0dp"
+        android:padding="0dp"
+        android:minWidth="34dp"
+        android:contentDescription="취소"
+        app:backgroundTint="#FEF2F2"
+        app:cornerRadius="17dp"
+        app:layout_constraintTop_toTopOf="@id/cta_btn"
+        app:layout_constraintBottom_toBottomOf="@id/cta_btn"
+        app:layout_constraintStart_toEndOf="@id/folder_btn"
+        app:layout_constraintEnd_toEndOf="parent"/>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
