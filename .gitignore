@@ -1,0 +1,18 @@
+# mobile 공통 (cross-platform)
+# 플랫폼별 규칙은 각 서브폴더 gitignore 참고:
+#   android/.gitignore  (+ android/app/.gitignore)
+#   ios/.gitignore
+
+# ─── macOS ───
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon?
+._*
+.Spotlight-V100
+.Trashes
+
+# ─── 공통 ───
+*.log
+.env
+.env.local
