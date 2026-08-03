@@ -65,8 +65,6 @@ final class SharePreviewModel: ObservableObject {
         return false
     }
 
-    var isAuthenticated: Bool { token != nil }
-
     init(sharedUrl: String, token: String?) {
         self.sharedUrl = sharedUrl
         self.token = token

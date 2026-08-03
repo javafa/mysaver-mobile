@@ -5,9 +5,9 @@
 //  iOS Share Extension 진입점. URL 추출 후 SwiftUI ShareSheetView 를 루트로 임베드.
 //
 //  흐름:
-//  1) inputItems 에서 URL 추출
-//  2) App Group 의 JWT 확인 (없으면 안내 + URL stash → 메인앱이 처리)
-//  3) UIHostingController(ShareSheetView) 를 root child 로 임베드
+//  1) inputItems 에서 URL 추출 + App Group 에 URL stash (메인앱이 소비)
+//  2) 토큰 유효성 판정 (ShareAuth) — 존재 여부가 아니라 만료/폐기까지
+//  3) 유효하면 ShareSheetView, 아니면 ShareLoginPromptView 를 root child 로 임베드
 //  4) onClose 콜백 → extensionContext.completeRequest
 //
 
@@ -48,19 +48,49 @@ final class ShareViewController: UIViewController {
         }
         defaults?.set(urlString, forKey: ShareConfig.pendingShareKey)
         let token = defaults?.string(forKey: ShareConfig.tokenKey)
-        NSLog("[MySaverShare] token 존재: %@", token != nil ? "YES" : "NO")
 
-        // 토큰 유무와 관계없이 시트는 항상 표시. 토큰 없으면 안내 UI 가 내부에서 표시됨.
+        // 토큰 판정이 끝나기 전에는 시트를 그리지 않는다. 무효 토큰으로 시트를 띄우면
+        // preview/folders 가 전부 401 이라 빈 썸네일 + "(제목 없음)" 만 남는다.
+        await MainActor.run { embed(AnyView(ShareLoadingView())) }
+        let auth = await ShareAuth.verify(token: token)
+
         await MainActor.run {
-            let model = SharePreviewModel(sharedUrl: urlString, token: token)
-            self.previewModel = model
-            let sheet = ShareSheetView(
-                model: model,
-                onClose: { [weak self] in self?.complete() },
-                onOpenMainApp: { [weak self] in self?.openMainApp(with: urlString) }
-            )
-            embed(AnyView(sheet))
+            switch auth {
+            case .signedOut:
+                showLoginPrompt(reason: .signedOut, urlString: urlString)
+            case .expired:
+                showLoginPrompt(reason: .expired, urlString: urlString)
+            case .banned:
+                showLoginPrompt(reason: .banned, urlString: urlString)
+
+            case .valid, .unreachable:
+                // unreachable: 서버 도달 실패는 토큰 무효의 근거가 아니다.
+                // 로그인한 사용자를 오프라인이라는 이유로 로그아웃 취급하지 않고,
+                // 시트를 띄운 뒤 저장 실패 경로가 재시도를 안내하게 둔다.
+                guard let token else {
+                    showLoginPrompt(reason: .signedOut, urlString: urlString)
+                    return
+                }
+                let model = SharePreviewModel(sharedUrl: urlString, token: token)
+                self.previewModel = model
+                let sheet = ShareSheetView(
+                    model: model,
+                    onClose: { [weak self] in self?.complete() }
+                )
+                embed(AnyView(sheet))
+            }
         }
+    }
+
+    @MainActor
+    private func showLoginPrompt(reason: ShareLoginPromptView.Reason, urlString: String) {
+        let prompt = ShareLoginPromptView(
+            reason: reason,
+            sharedUrl: urlString,
+            onOpenMainApp: { [weak self] in self?.openMainApp(with: urlString) },
+            onClose: { [weak self] in self?.complete() }
+        )
+        embed(AnyView(prompt))
     }
 
     /// 토큰 없을 때 "MySaver 열기" 탭 시 호출. 메인 앱이 pending_share_url 을 소비.
@@ -152,7 +182,20 @@ final class ShareViewController: UIViewController {
     }
 }
 
-// MARK: - Fallback view
+// MARK: - Loading / Fallback views
+
+/// 토큰 판정 중 표시. 시트와 로그인 안내 중 무엇을 그릴지 아직 모르는 구간.
+struct ShareLoadingView: View {
+    var body: some View {
+        VStack {
+            Spacer()
+            ProgressView()
+            Spacer()
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .background(Color(.systemBackground))
+    }
+}
 
 struct ShareFallbackView: View {
     let message: String

@@ -2,7 +2,8 @@
 //  ShareSheetView.swift
 //  MySaverShare
 //
-//  iOS Share Extension 메인 SwiftUI 뷰.
+//  iOS Share Extension 메인 SwiftUI 뷰. 로그인 상태에서만 표시된다
+//  (비로그인은 ShareLoginPromptView).
 //  와이어프레임: 드래그핸들 / 썸네일 / 제목·메타 / 태그 / 노트 / 리마인드 / 바텀바
 //
 
@@ -14,9 +15,6 @@ struct ShareSheetView: View {
 
     /// "추가하기" 성공/취소 시 호출 — ShareViewController.complete() 트리거.
     var onClose: () -> Void
-
-    /// 토큰 없을 때 "MySaver 열기" 탭 시 호출. nil 이면 버튼 숨김.
-    var onOpenMainApp: (() -> Void)? = nil
 
     @State private var showFolderPicker: Bool = false
     @FocusState private var noteFieldFocused: Bool
@@ -208,16 +206,7 @@ struct ShareSheetView: View {
         .padding(.top, 10)
     }
 
-    @ViewBuilder
     private var bottomBar: some View {
-        if model.isAuthenticated {
-            authedBottomBar
-        } else {
-            unauthedBottomBar
-        }
-    }
-
-    private var authedBottomBar: some View {
         HStack(spacing: 8) {
             Button {
                 Task {
@@ -281,45 +270,6 @@ struct ShareSheetView: View {
         .overlay(alignment: .top) {
             statusOverlay
         }
-    }
-
-    /// 로그인 안 한 상태: 메인 앱 열기 CTA.
-    private var unauthedBottomBar: some View {
-        VStack(spacing: 8) {
-            Text("MySaver 앱에 로그인 후 저장할 수 있어요")
-                .font(.system(size: 11))
-                .foregroundStyle(.secondary)
-                .multilineTextAlignment(.center)
-
-            HStack(spacing: 8) {
-                if let openMainApp = onOpenMainApp {
-                    Button {
-                        openMainApp()
-                    } label: {
-                        Text("MySaver 앱 열기")
-                            .font(.system(size: 13, weight: .bold))
-                            .foregroundColor(Color(.systemBackground))
-                            .frame(maxWidth: .infinity, minHeight: 40)
-                            .background(Color(.label))
-                            .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
-                    }
-                }
-
-                Button {
-                    onClose()
-                } label: {
-                    Text("취소")
-                        .font(.system(size: 13, weight: .semibold))
-                        .foregroundColor(.secondary)
-                        .frame(minWidth: 60, minHeight: 40)
-                        .padding(.horizontal, 12)
-                        .background(Color(.systemGray6))
-                        .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
-                }
-            }
-        }
-        .padding(.horizontal, 16)
-        .padding(.vertical, 12)
     }
 
     @ViewBuilder
